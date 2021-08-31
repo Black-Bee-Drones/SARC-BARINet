@@ -1,7 +1,6 @@
 
 import asyncio
 from mavsdk import System
-from mavsdk import telemetry
 
 
 async def run():
@@ -14,8 +13,6 @@ async def run():
     await drone2.connect(system_address="udp://:14541")
     await drone3.connect(system_address="udp://:14542")
 
-    print(f"{drone1.telemetry.health}, {drone2.telemetry.health}, {drone3.telemetry.health}"
-    
     print("Waiting for drone 1 to connect...")
     async for state in drone1.core.connection_state():
         if state.is_connected:
