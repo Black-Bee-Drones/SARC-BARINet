@@ -11,23 +11,27 @@ async def get_lat_lng(drone):  # Define a função para pegar a posição do dro
         return [position.latitude_deg, position.longitude_deg]
 
 
+#Função principal que roda tudo
 async def run():
 
     drone = System()
     await drone.connect(system_address="udp://:14540")
 
+    #Conecta o drone
     print("Waiting for drone to connect...")
     async for state in drone.core.connection_state():
         if state.is_connected:
             print(f"Drone discovered!")
             break
 
+        
     print("Waiting for drone to have a global position estimate...")
     async for health in drone.telemetry.health():
         if health.is_global_position_ok:
             print("Global position estimate ok")
             break
 
+    #Arma o drone
     print("-- Arming")
     await drone.action.arm()
 
