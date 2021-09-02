@@ -1,0 +1,23 @@
+[   ] Calibrar os sensores
+
+[   ] Definir a home
+
+[   ] Decolar e ir para o ponto de início
+
+[   ] Decolar
+
+[   ] Ir para a coordenada inicial
+
+[   ] Detectar fogo (ajuda da galera da detecção)
+
+[   ] Movimentar o drone em uma área pré-definida
+
+[   ] Comunicação entre os drones (para quando encontrar fogo)
+
+[  ] Enviar as coordenadas um para o outro quando fogo for encontrado
+
+[   ] Análise em raio de 10 metros
+
+[   ] Função de coordenada inicial recebe as novas coordenadas e o processo é repetido
+
+[   ] Retorno ao ponto de home
