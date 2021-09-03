@@ -1,3 +1,26 @@
+'''
+[ x ] Definir a home
+
+[ x ] Decolar e ir para o ponto de início
+
+[   ] Detectar fogo (ajuda da galera da detecção)
+
+[   ] Movimentar o drone em uma área pré-definida
+
+[   ] Comunicação entre os drones (para quando encontrar fogo)
+
+[  ] Enviar as coordenadas um para o outro quando fogo for encontrado
+
+[   ] Análise em raio de 10 metros
+
+[   ] Função de coordenada inicial recebe as novas coordenadas e o processo é repetido
+
+[   ] Bateria em nível baixo mandando o drone pra casa
+
+[   ] Retorno ao ponto de home
+'''
+
+
 
 import asyncio
 from mavsdk import System
@@ -39,6 +62,23 @@ async def run():
 
     print("-- Arming 3 ")
     await drone3.action.arm()
+
+    #Drones decolam 
+    print("-- Takeoff")
+    await drone1.action.takeoff()
+    print("-- Takeoff 2")
+    await drone2.action.takeoff()
+    print("-- Takeoff 3")
+    await drone3.action.takeoff()
+
+    #Drones vão para o ponto de início
+    print("-- Going to the seted point")
+    await drone1.action.goto_location(-22.41045229156762, -45.451661754067395) 
+    print("-- Going to the seted point 2")
+    await drone2.action.goto_location(-22.41371539301897, -45.44558583950819)
+    print("-- Going to the seted point 3")
+    await drone3.action.goto_location(-22.413776005704467, -45.45026259433155)
+
 
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
