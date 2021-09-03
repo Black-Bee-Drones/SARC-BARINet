@@ -17,11 +17,12 @@
 
 [   ] Bateria em nível baixo mandando o drone pra casa
 
-    [   ] Retorno ao ponto de home
+[   ] Retorno ao ponto de home
 '''
 
 
-
+import airsim
+import cv2
 import asyncio
 from mavsdk import System, action
 
@@ -74,6 +75,12 @@ async def run():
     print("-- Takeoff 3")
     await drone3.action.takeoff()
 
+    # Começa a tirar as fotos dos 3 drones
+    print("Starting taking photos. . .")
+    asyncio.ensure_future(camera1())
+    asyncio.ensure_future(camera2())
+    asyncio.ensure_future(camera3())
+
     #Drones vão para o ponto de início
     print("-- Going to the seted point")
     await drone1.action.goto_location(-22.41045229156762, -45.451661754067395, 850, 0) 
@@ -82,6 +89,74 @@ async def run():
     print("-- Going to the seted point 3")
     await drone3.action.goto_location(-22.413776005704467, -45.45026259433155, 850, 0)
 
+    try:
+        print("Drone 1 returning to launch")
+        await drone1.action.return_to_launch()
+    except:
+        try:
+            await drone1.action.land()
+        except:
+            print("Drone 1 could not neither return to launch or land")
+    
+    try:
+        # print("Drone 2 returning to launch")
+        await drone2.action.return_to_launch()
+    except:
+        try:
+            await drone2.action.land()
+        except:
+            print("Drone 2 could not neither return to launch or land")
+
+    try:
+        print("Drone 3 returning to launch")
+        await drone3.action.return_to_launch()
+    except:
+        try:
+            await drone3.action.land()
+        except:
+            print("Drone 3 could not neither return to launch or land")
+
+
+async def camera1():
+    while True:
+        # print(f"Taking photos Drone1. . .")
+        client = airsim.MultirotorClient()
+
+        rawImage = client.simGetImage("0", airsim.ImageType.Scene, vehicle_name='Drone1')
+        # print('Retrieved images: %d' % len(rawImage))
+
+        png = cv2.imdecode(airsim.string_to_uint8_array(rawImage), cv2.IMREAD_UNCHANGED)
+        cv2.imshow("Depth", png)
+        # Delay to take photos
+        await asyncio.sleep(2)
+
+
+async def camera2():
+    while True:
+        # print(f"Taking photos Drone2. . .")
+        client = airsim.MultirotorClient()
+
+        rawImage = client.simGetImage("0", airsim.ImageType.Scene, vehicle_name='Drone2')
+        # print('Retrieved images: %d' % len(rawImage))
+
+        png = cv2.imdecode(airsim.string_to_uint8_array(rawImage), cv2.IMREAD_UNCHANGED)
+        cv2.imshow("Depth", png)
+        # Delay to take photos
+        await asyncio.sleep(2)
+
+
+async def camera3():
+    while True:
+        # print(f"Taking photos Drone3. . .")
+        client = airsim.MultirotorClient()
+
+        rawImage = client.simGetImage("0", airsim.ImageType.Scene, vehicle_name='Drone3')
+        # print('Retrieved images: %d' % len(rawImage))
+
+        png = cv2.imdecode(airsim.string_to_uint8_array(rawImage), cv2.IMREAD_UNCHANGED)
+        cv2.imshow("Depth", png)
+        # Delay to take photos
+        await asyncio.sleep(2)
     
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
