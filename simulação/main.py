@@ -17,13 +17,13 @@
 
 [   ] Bateria em nível baixo mandando o drone pra casa
 
-[   ] Retorno ao ponto de home
+    [   ] Retorno ao ponto de home
 '''
 
 
 
 import asyncio
-from mavsdk import System
+from mavsdk import System, action
 
 
 async def run():
@@ -54,6 +54,7 @@ async def run():
             print(f"Drone 3 discovered!")
             break
 
+    #Drones armam
     print("-- Arming")
     await drone1.action.arm()
 
@@ -66,20 +67,22 @@ async def run():
     #Drones decolam 
     print("-- Takeoff")
     await drone1.action.takeoff()
+
     print("-- Takeoff 2")
     await drone2.action.takeoff()
+
     print("-- Takeoff 3")
     await drone3.action.takeoff()
 
     #Drones vão para o ponto de início
     print("-- Going to the seted point")
-    await drone1.action.goto_location(-22.41045229156762, -45.451661754067395) 
+    await drone1.action.goto_location(-22.41045229156762, -45.451661754067395, 850, 0) 
     print("-- Going to the seted point 2")
-    await drone2.action.goto_location(-22.41371539301897, -45.44558583950819)
+    await drone2.action.goto_location(-22.41371539301897, -45.44558583950819, 850, 0)
     print("-- Going to the seted point 3")
-    await drone3.action.goto_location(-22.413776005704467, -45.45026259433155)
+    await drone3.action.goto_location(-22.413776005704467, -45.45026259433155, 850, 0)
 
-
+    
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
     loop.run_until_complete(run())
