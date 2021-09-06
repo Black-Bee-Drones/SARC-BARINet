@@ -5,6 +5,8 @@
 
 [   ] Detectar fogo (ajuda da galera da detecção)
 
+[ x ] Cameras tirando fotos
+
 [   ] Movimentar o drone em uma área pré-definida
 
 [   ] Comunicação entre os drones (para quando encontrar fogo)
@@ -15,8 +17,6 @@
 
 [   ] Função de coordenada inicial recebe as novas coordenadas e o processo é repetido
 
-[   ] Bateria em nível baixo mandando o drone pra casa
-
 [   ] Retorno ao ponto de home
 '''
 
@@ -25,6 +25,7 @@ import airsim
 import cv2
 import asyncio
 from mavsdk import System, action
+from mavsdk.mission import (MissionItem, MissionPlan)
 
 
 async def run():
@@ -89,6 +90,23 @@ async def run():
     print("-- Going to the seted point 3")
     await drone3.action.goto_location(-22.413776005704467, -45.45026259433155, 850, 0)
 
+    #Primeiro varrimento em linha reta(Falta adicionar as coordenadas)
+    print("-- Going to the first waypoint")
+    await drone1.action.goto_location( -22.41045229156742, -45.451661754067415, 850, 0)
+    print("-- Going to the first waypoint 2")
+    await drone2.action.goto_location( lat, long, alt, yaw)
+    print("-- Going to the first waypoint 3")
+    await drone3.action.goto_location( lat, long, alt, yaw)
+
+    #Segundo varrimento em linha reta(Falta adicionar as coordenadas)
+    print("-- Going to the second waypoint")
+    await drone1.action.goto_location( lat, long, alt, yaw)
+    print("-- Going to the second waypoint 2")
+    await drone2.action.goto_location( lat, long, alt, yaw)
+    print("-- Going to the second waypoint 3")
+    await drone3.action.goto_location( lat, long, alt, yaw)
+    #Terceiro varrimento em linha reta(caso necessário)
+    
     try:
         print("Drone 1 returning to launch")
         await drone1.action.return_to_launch()
@@ -157,6 +175,7 @@ async def camera3():
         cv2.imshow("Depth", png)
         # Delay to take photos
         await asyncio.sleep(2)
+        
     
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
