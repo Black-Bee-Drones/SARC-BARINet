@@ -7,15 +7,9 @@
 
 [ x ] Cameras tirando fotos
 
-[   ] Movimentar o drone em uma área pré-definida
+[ ? ] Movimentar o drone em uma área pré-definida
 
-[   ] Comunicação entre os drones (para quando encontrar fogo)
-
-[  ] Enviar as coordenadas um para o outro quando fogo for encontrado
-
-[   ] Análise em raio de 10 metros
-
-[   ] Função de coordenada inicial recebe as novas coordenadas e o processo é repetido
+[   ] Enviar as coordenadas para a GroundStation
 
 [   ] Retorno ao ponto de home
 '''
@@ -112,16 +106,6 @@ async def run():
         VelocityBodyYawspeed(0.0, 0.0, 0.0, -30.0))
     await asyncio.sleep(3)
 
-    #Drones esperam 2 segundos e reajustam suas posições
-    print("-- Wait for a bit")
-    await drone1.offboard.set_velocity_body(
-        VelocityBodyYawspeed(0.0, 0.0, 0.0, -30.0))
-    await drone2.offboard.set_velocity_body(
-        VelocityBodyYawspeed(0.0, 0.0, 0.0, 0.0))
-    await drone3.offboard.set_velocity_body(
-        VelocityBodyYawspeed(0.0, 0.0, 0.0, 30.0))
-    await asyncio.sleep(2)
-
     #Drones das extremidades se distanciam 600 metros do central
     print("-- Going to the first waypoint")
     await drone1.offboard.set_velocity_body(
@@ -131,6 +115,16 @@ async def run():
     await drone3.offboard.set_velocity_body(
         VelocityBodyYawspeed(10.0, 0.0, 0.0, 0.0))
     await asyncio.sleep(60)
+
+    #Drones esperam 2 segundos e reajustam suas posições
+    print("-- Wait for a bit")
+    await drone1.offboard.set_velocity_body(
+        VelocityBodyYawspeed(0.0, 0.0, 0.0, -30.0))
+    await drone2.offboard.set_velocity_body(
+        VelocityBodyYawspeed(0.0, 0.0, 0.0, 0.0))
+    await drone3.offboard.set_velocity_body(
+        VelocityBodyYawspeed(0.0, 0.0, 0.0, 30.0))
+    await asyncio.sleep(2)
     
     #Drones começam a patrulha
     print("-- Starting patrol")
@@ -162,6 +156,7 @@ async def run():
         VelocityBodyYawspeed(10.0, 0.0, 0.0, 6.0))
     await asyncio.sleep(60)
 
+    #Drones retornam ao ponto de decolagem
     print("-- Returning to the launch point")
     await drone1.action.return_to_launch
     await drone2.action.return_to_launch
