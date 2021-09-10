@@ -35,7 +35,7 @@ async def run():
     print("-- Arming")
     await drone.action.arm()
 
-    await drone.action.set_takeoff_altitude(4)  # Configura a altitude de decolagem para 10 m
+    await drone.action.set_takeoff_altitude(3)  # Configura a altitude de decolagem para 3 m
     print("-- Taking off")
     await drone.action.takeoff()
     await asyncio.sleep(12)
