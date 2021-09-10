@@ -3,41 +3,42 @@
 import asyncio
 from mavsdk import System
 from mavsdk.offboard import (VelocityBodyYawspeed, OffboardError)
+from satellite_imagery import get_satellite_image
 
 
-async def print_position(drone): # Define a função para pegar a posição do drone
+async def get_lat_lng(drone):  # Define a função para pegar a posição do drone
     async for position in drone.telemetry.position():
-        print(position)
-        break
+        return [position.latitude_deg, position.longitude_deg]
 
 
+#Função principal que roda tudo
 async def run():
 
     drone = System()
     await drone.connect(system_address="udp://:14540")
 
+    #Conecta o drone
     print("Waiting for drone to connect...")
     async for state in drone.core.connection_state():
         if state.is_connected:
             print(f"Drone discovered!")
             break
 
+        
     print("Waiting for drone to have a global position estimate...")
     async for health in drone.telemetry.health():
         if health.is_global_position_ok:
             print("Global position estimate ok")
             break
 
+    #Arma o drone
     print("-- Arming")
     await drone.action.arm()
 
-    await drone.action.set_takeoff_altitude(10)  # Configura a altitude de decolagem para 10 m
+    await drone.action.set_takeoff_altitude(4)  # Configura a altitude de decolagem para 10 m
     print("-- Taking off")
     await drone.action.takeoff()
-    await asyncio.sleep(20)
-
-    print("-- Printing position")
-    await print_position(drone)
+    await asyncio.sleep(12)
 
     print("-- Setting offboard initial setpoint")  # Configura as velocidades relativas atuais como 0
     await drone.offboard.set_velocity_body(VelocityBodyYawspeed(0.0, 0.0, 0.0, 0.0))
@@ -60,6 +61,7 @@ async def run():
         tem_fogo = True
         await asyncio.sleep(15)
         if tem_fogo:
+            get_satellite_image(await get_lat_lng(drone))
             break
 
     print("-- Stopping offboard")
@@ -69,9 +71,7 @@ async def run():
         print(f"Stopping offboard mode failed with error code: \
                   {error._result.result}")
 
-    print("-- Printing position")
-    await print_position(drone)
-
+    await drone.action.set_return_to_launch_altitude(4)
     print("-- Returning to launch and landing")
     await drone.action.return_to_launch()
 
