@@ -14,7 +14,7 @@
         ],
         "Gimbal": {
             "Stabilization": 0.5,
-            "Pitch": -45
+            "Pitch": -30
         }
     },
     "Vehicles": {
