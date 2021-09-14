@@ -3,21 +3,18 @@ import asyncio
 from asyncio.events import get_event_loop
 from mavsdk import System
 from mavsdk.offboard import (OffboardError, VelocityBodyYawspeed,VelocityNedYaw, PositionNedYaw)
-# import airsim
-# import numpy as np
-# import os
-# import tempfile
-# import cv2
-
+import cv2
+import numpy as np
+import airsim
+import time
 
 #Definição do drone 1 como variável global para poder utilizar em qualquer função assíncrona
-
 drone3 = System(mavsdk_server_address='localhost', port=50042)
 
 async def main():
     
-    drone_voando = asyncio.create_task(movimentacao_drone3())
-    await drone_voando
+    cam = asyncio.create_task(camera3())
+    await cam
 
 
 async def movimentacao_drone3():
@@ -25,7 +22,7 @@ async def movimentacao_drone3():
     global drone3
     
     #Drone se conecta
-    await drone3.connect(system_address="udp://:14540")
+    await drone3.connect(system_address="udp://:14542")
     
     print("Waiting for drone 1 to connect...")
     async for state in drone3.core.connection_state():
@@ -89,7 +86,29 @@ async def movimentacao_drone3():
 
 async def camera3():
     drone3_fly = asyncio.create_task(movimentacao_drone3())
-    await drone3
+    client = airsim.MultirotorClient()
+    
+    while True:
+        start = time.time()
+        responses = client.simGetImages([airsim.ImageRequest("0", airsim.ImageType.Scene, False, False)],
+                                    vehicle_name='Drone3')
+        response = responses[0]
+        img1d = np.fromstring(response.image_data_uint8, dtype=np.uint8)
+        img_rgb = img1d.reshape(response.height, response.width, 3)
+
+        cv2.imshow('Janela', img_rgb)
+
+        end = time.time()
+        fps = 1 / (end-start)
+        print("FPS: ", "{:.2f}".format(fps))
+
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            asyncio.Task.cancel(drone3_fly)
+            break
+
+        await asyncio.sleep(0.1)
+
+    cv2.destroyAllWindows()
     
 
 if __name__ == "__main__":

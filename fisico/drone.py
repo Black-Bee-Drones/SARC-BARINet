@@ -13,7 +13,7 @@ async def run():
             print(f"Drone discovered!")
             break
 
-    drone.action.set_takeoff_altitude(2.0);
+    drone.action.set_takeoff_altitude(2.0)
 
     print("Waiting for drone to have a global position estimate...")
     async for health in drone.telemetry.health():
