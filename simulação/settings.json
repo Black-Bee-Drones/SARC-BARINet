@@ -3,6 +3,20 @@
     "SimMode": "Multirotor",
     "ClockType": "SteppableClock",
     "DefaultVehicleConfig": "PX4",
+    "CameraDefaults": {
+        "CaptureSettings": [
+            {
+                "ImageType": -1,
+                "Width": 320,
+                "Height": 180,
+                "FOV_Degrees": 80
+            }
+        ],
+        "Gimbal": {
+            "Stabilization": 0.5,
+            "Pitch": -30
+        }
+    },
     "Vehicles": {
         "Drone1": {
             "VehicleType": "PX4Multirotor",
@@ -13,7 +27,9 @@
             "ControlIp": "remote",
             "ControlPortRemote": 14540,
             "LocalHostIp": "172.26.16.1",
-            "X": 0, "Y": 1, "Z": 0,
+            "X": 0,
+            "Y": 1,
+            "Z": 0,
             "Sensors": {
                 "Barometer": {
                     "SensorType": 1,
@@ -27,105 +43,84 @@
                 "COM_OBL_ACT": 1,
                 "LPE_LAT": 47.641468,
                 "LPE_LON": -122.140165
-            },
-            "CameraDefaults": {
-                "CaptureSettings": [
-                    {
-                        "ImageType": 0,
-                        "Width": 320,
-                        "Height": 180,
-                        "FOV_Degrees": 80
-                    },
-                    {
-                        "ImageType": 3,
-                        "Width": 320,
-                        "Height": 180,
-                        "FOV_Degrees": 80
-                    }
-                ]
             }
         },
         "Drone2": {
-          "VehicleType": "PX4Multirotor",
-          "UseSerial": false,
-          "LockStep": true,
-          "UseTcp": true,
-          "TcpPort": 4561,
-          "ControlIp": "remote",
-          "ControlPortRemote": 14541,
-          "LocalHostIp": "172.26.16.1",
-          "X": 0, "Y": -1, "Z": 0,
-          "Sensors": {
-              "Barometer": {
-                  "SensorType": 1,
-                  "Enabled": true,
-                  "PressureFactorSigma": 0.0001825
-              }
-          },
-          "Parameters": {
-              "NAV_RCL_ACT": 0,
-              "NAV_DLL_ACT": 0,
-              "COM_OBL_ACT": 1,
-              "LPE_LAT": 47.641468,
-              "LPE_LON": -122.140165
-          },
-          "CameraDefaults": {
-              "CaptureSettings": [
-                  {
-                      "ImageType": 0,
-                      "Width": 320,
-                      "Height": 180,
-                      "FOV_Degrees": 80
-                  },
-                  {
-                      "ImageType": 3,
-                      "Width": 320,
-                      "Height": 180,
-                      "FOV_Degrees": 80
-                  }
-              ]
-          }
-      },
-      "Drone3": {
-        "VehicleType": "PX4Multirotor",
-        "UseSerial": false,
-        "LockStep": true,
-        "UseTcp": true,
-        "TcpPort": 4562,
-        "ControlIp": "remote",
-        "ControlPortRemote": 14542,
-        "LocalHostIp": "172.26.16.1",
-        "X": 0, "Y": 3, "Z": 0,
-        "Sensors": {
-            "Barometer": {
-                "SensorType": 1,
-                "Enabled": true,
-                "PressureFactorSigma": 0.0001825
+            "VehicleType": "PX4Multirotor",
+            "UseSerial": false,
+            "LockStep": true,
+            "UseTcp": true,
+            "TcpPort": 4561,
+            "ControlIp": "remote",
+            "ControlPortRemote": 14541,
+            "LocalHostIp": "172.26.16.1",
+            "X": 0,
+            "Y": -1,
+            "Z": 0,
+            "Sensors": {
+                "Barometer": {
+                    "SensorType": 1,
+                    "Enabled": true,
+                    "PressureFactorSigma": 0.0001825
+                }
+            },
+            "Parameters": {
+                "NAV_RCL_ACT": 0,
+                "NAV_DLL_ACT": 0,
+                "COM_OBL_ACT": 1,
+                "LPE_LAT": 47.641468,
+                "LPE_LON": -122.140165
             }
         },
-        "Parameters": {
-            "NAV_RCL_ACT": 0,
-            "NAV_DLL_ACT": 0,
-            "COM_OBL_ACT": 1,
-            "LPE_LAT": 47.641468,
-            "LPE_LON": -122.140165
-        },
-        "CameraDefaults": {
-            "CaptureSettings": [
-                {
-                    "ImageType": 0,
-                    "Width": 320,
-                    "Height": 180,
-                    "FOV_Degrees": 80
-                },
-                {
-                    "ImageType": 3,
-                    "Width": 320,
-                    "Height": 180,
-                    "FOV_Degrees": 80
+        "Drone3": {
+            "VehicleType": "PX4Multirotor",
+            "UseSerial": false,
+            "LockStep": true,
+            "UseTcp": true,
+            "TcpPort": 4562,
+            "ControlIp": "remote",
+            "ControlPortRemote": 14542,
+            "LocalHostIp": "172.26.16.1",
+            "X": 0,
+            "Y": 3,
+            "Z": 0,
+            "Sensors": {
+                "Barometer": {
+                    "SensorType": 1,
+                    "Enabled": true,
+                    "PressureFactorSigma": 0.0001825
                 }
-            ]
-          }
-      }
-    }
-  }
+            },
+            "Parameters": {
+                "NAV_RCL_ACT": 0,
+                "NAV_DLL_ACT": 0,
+                "COM_OBL_ACT": 1,
+                "LPE_LAT": 47.641468,
+                "LPE_LON": -122.140165
+            }
+        }
+    },
+    "SubWindows": [
+        {
+            "WindowID": 0,
+            "CameraName": "0",
+            "ImageType": 0,
+            "VehicleName": "Drone1",
+            "Visible": true
+        },
+        {
+            "WindowID": 1,
+            "CameraName": "0",
+            "ImageType": 0,
+            "VehicleName": "Drone2",
+            "Visible": true
+        },
+        {
+            "WindowID": 2,
+            "CameraName": "0",
+            "ImageType": 0,
+            "VehicleName": "Drone3",
+            "Visible": true
+        }
+    ]
+}

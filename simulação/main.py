@@ -7,26 +7,20 @@
 
 [ x ] Cameras tirando fotos
 
-[   ] Movimentar o drone em uma área pré-definida
+[ ? ] Movimentar o drone em uma área pré-definida
 
-[   ] Comunicação entre os drones (para quando encontrar fogo)
-
-[  ] Enviar as coordenadas um para o outro quando fogo for encontrado
-
-[   ] Análise em raio de 10 metros
-
-[   ] Função de coordenada inicial recebe as novas coordenadas e o processo é repetido
+[   ] Enviar as coordenadas para a GroundStation
 
 [   ] Retorno ao ponto de home
 '''
 
 
+from time import sleep
 import airsim
 import cv2
 import asyncio
 from mavsdk import System, action
-from mavsdk.mission import (MissionItem, MissionPlan)
-
+from mavsdk.offboard import (OffboardError, VelocityBodyYawspeed)
 
 import asyncio
 from mavsdk import System
@@ -90,31 +84,92 @@ async def run():
     asyncio.ensure_future(camera2())
     asyncio.ensure_future(camera3())
 
-    #Drones vão para o ponto de início
-    print("-- Going to the seted point")
-    await drone1.action.goto_location(-22.41045229156762, -45.451661754067395, 850, 0) 
-    print("-- Going to the seted point 2")
-    await drone2.action.goto_location(-22.41371539301897, -45.44558583950819, 850, 0)
-    print("-- Going to the seted point 3")
-    await drone3.action.goto_location(-22.413776005704467, -45.45026259433155, 850, 0)
+    #Drones decolam
+    print("-- Taking off")
+    await drone1.offboard.set_velocity_body(
+        VelocityBodyYawspeed(0.0, 0.0, -2.0, 0.0))
+    await drone2.offboard.set_velocity_body(
+        VelocityBodyYawspeed(0.0, 0.0, -2.0, 0.0))
+    await drone3.offboard.set_velocity_body(
+        VelocityBodyYawspeed(0.0, 0.0, -2.0, 0.0))
+    await asyncio.sleep(8)
 
-    #Primeiro varrimento em linha reta(Falta adicionar as coordenadas)
+    #Drones esperam 2 segundos
+    print("-- Wait for a bit")
+    await drone1.offboard.set_velocity_body(
+        VelocityBodyYawspeed(0.0, 0.0, 0.0, 0.0))
+    await drone2.offboard.set_velocity_body(
+        VelocityBodyYawspeed(0.0, 0.0, 0.0, 0.0))
+    await drone3.offboard.set_velocity_body(
+        VelocityBodyYawspeed(0.0, 0.0, 0.0, 0.0))
+    await asyncio.sleep(2)
+
+    #Drones rotacionam em direção aos pontos de início
+    print("-- Rotating")
+    await drone1.offboard.set_velocity_body(
+        VelocityBodyYawspeed(0.0, 0.0, 0.0, 30.0))
+    await drone2.offboard.set_velocity_body(
+        VelocityBodyYawspeed(0.0, 0.0, 0.0, 0.0))
+    await drone3.offboard.set_velocity_body(
+        VelocityBodyYawspeed(0.0, 0.0, 0.0, -30.0))
+    await asyncio.sleep(3)
+
+    #Drones das extremidades se distanciam 600 metros do central
     print("-- Going to the first waypoint")
-    await drone1.action.goto_location( -22.41045229156742, -45.451661754067415, 850, 0)
-    print("-- Going to the first waypoint 2")
-    await drone2.action.goto_location( lat, long, alt, yaw)
-    print("-- Going to the first waypoint 3")
-    await drone3.action.goto_location( lat, long, alt, yaw)
+    await drone1.offboard.set_velocity_body(
+        VelocityBodyYawspeed(10.0, 0.0, 0.0, 0.0))
+    await drone2.offboard.set_velocity_body(
+        VelocityBodyYawspeed(0.0, 0.0, 0.0, 6.0))
+    await drone3.offboard.set_velocity_body(
+        VelocityBodyYawspeed(10.0, 0.0, 0.0, 0.0))
+    await asyncio.sleep(60)
 
-    #Segundo varrimento em linha reta(Falta adicionar as coordenadas)
-    print("-- Going to the second waypoint")
-    await drone1.action.goto_location( lat, long, alt, yaw)
-    print("-- Going to the second waypoint 2")
-    await drone2.action.goto_location( lat, long, alt, yaw)
-    print("-- Going to the second waypoint 3")
-    await drone3.action.goto_location( lat, long, alt, yaw)
-    #Terceiro varrimento em linha reta(caso necessário)
+    #Drones esperam 2 segundos e reajustam suas posições
+    print("-- Wait for a bit")
+    await drone1.offboard.set_velocity_body(
+        VelocityBodyYawspeed(0.0, 0.0, 0.0, -30.0))
+    await drone2.offboard.set_velocity_body(
+        VelocityBodyYawspeed(0.0, 0.0, 0.0, 0.0))
+    await drone3.offboard.set_velocity_body(
+        VelocityBodyYawspeed(0.0, 0.0, 0.0, 30.0))
+    await asyncio.sleep(2)
     
+    #Drones começam a patrulha
+    print("-- Starting patrol")
+    await drone1.offboard.set_velocity_body(
+        VelocityBodyYawspeed(10.0, 0.0, 0.0, 6.0))
+    await drone2.offboard.set_velocity_body(
+        VelocityBodyYawspeed(10.0, 0.0, 0.0, 6.0))
+    await drone3.offboard.set_velocity_body(
+        VelocityBodyYawspeed(10.0, 0.0, 0.0, 6.0))
+    await asyncio.sleep(60)
+
+    #Drones vão 180m para frente
+    print("-- Going to the second waypoint")
+    await drone1.offboard.set_velocity_body(
+        VelocityBodyYawspeed(10.0, 0.0, 0.0, 0.0))
+    await drone2.offboard.set_velocity_body(
+        VelocityBodyYawspeed(10.0, 0.0, 0.0, 6.0))
+    await drone3.offboard.set_velocity_body(
+        VelocityBodyYawspeed(10.0, 0.0, 0.0, 0.0))
+    await asyncio.sleep(18)
+
+    #Drones começam a patrulha
+    print("-- Starting patrol")
+    await drone1.offboard.set_velocity_body(
+        VelocityBodyYawspeed(10.0, 0.0, 0.0, 6.0))
+    await drone2.offboard.set_velocity_body(
+        VelocityBodyYawspeed(10.0, 0.0, 0.0, 6.0))
+    await drone3.offboard.set_velocity_body(
+        VelocityBodyYawspeed(10.0, 0.0, 0.0, 6.0))
+    await asyncio.sleep(60)
+
+    #Drones retornam ao ponto de decolagem
+    print("-- Returning to the launch point")
+    await drone1.action.return_to_launch
+    await drone2.action.return_to_launch
+    await drone3.action.return_to_launch
+
     try:
         print("Drone 1 returning to launch")
         await drone1.action.return_to_launch()
@@ -155,6 +210,7 @@ async def camera1():
         cv2.imshow("Depth", png)
         # Delay to take photos
         await asyncio.sleep(2)
+
 
 
 async def camera2():
