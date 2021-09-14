@@ -13,6 +13,9 @@ Depois, faça as instalações que seguem.
 pip install mavsdk
 ```
 ```sh
+pip install asyncio
+```
+```sh
 pip install mercantile
 ```
 ```sh

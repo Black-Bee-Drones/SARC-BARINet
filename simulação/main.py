@@ -22,6 +22,10 @@ import asyncio
 from mavsdk import System, action
 from mavsdk.offboard import (OffboardError, VelocityBodyYawspeed)
 
+import asyncio
+from mavsdk import System
+
+
 async def run():
 
     drone1 = System(mavsdk_server_address="localhost", port=50040)
@@ -32,6 +36,7 @@ async def run():
     await drone2.connect(system_address="udp://:14541")
     await drone3.connect(system_address="udp://:14542")
 
+    
     print("Waiting for drone 1 to connect...")
     async for state in drone1.core.connection_state():
         if state.is_connected:
@@ -50,7 +55,9 @@ async def run():
             print(f"Drone 3 discovered!")
             break
 
+
     #Drones armam
+
     print("-- Arming")
     await drone1.action.arm()
 
@@ -59,6 +66,7 @@ async def run():
 
     print("-- Arming 3 ")
     await drone3.action.arm()
+
 
     #Drones decolam 
     print("-- Takeoff")
@@ -233,6 +241,7 @@ async def camera3():
         await asyncio.sleep(2)
         
     
+
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
     loop.run_until_complete(run())
