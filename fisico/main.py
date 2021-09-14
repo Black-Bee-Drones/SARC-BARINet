@@ -4,6 +4,7 @@ import asyncio
 from mavsdk import System
 from mavsdk.offboard import (VelocityBodyYawspeed, OffboardError)
 from satellite_imagery import get_satellite_image
+import detection
 
 
 async def get_lat_lng(drone):  # Define a função para pegar a posição do drone
@@ -52,9 +53,9 @@ async def run():
         print("-- Disarming")
         return
 
-    print("-- Going forward at 3 m/s")
-    await drone.offboard.set_velocity_body(
-        VelocityBodyYawspeed(3.0, 0.0, 0.0, 0.0))
+    # print("-- Going forward at 3 m/s")
+    # await drone.offboard.set_velocity_body(
+    #    VelocityBodyYawspeed(3.0, 0.0, 0.0, 0.0))
 
     while True:   # "Pausa" no código até que o fogo seja detectadoos
         # Roda o código de detecção e retorna se tem fogo

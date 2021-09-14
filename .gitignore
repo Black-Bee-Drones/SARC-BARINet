@@ -1,3 +1,5 @@
 /dataset/imgs
 /dataset/videos
 /fisico/fire-detection-tensorflow/videos
+/fisico/__pycache__
+/simulação/__pycache__
