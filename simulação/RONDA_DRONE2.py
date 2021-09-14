@@ -7,6 +7,7 @@ import cv2
 import airsim
 import numpy as np
 import time
+import detection
 
 #Definição do drone 1 como variável global para poder utilizar em qualquer função assíncrona
 drone2 = System(mavsdk_server_address='localhost', port=50041)
@@ -106,6 +107,8 @@ async def camera2():
     drone2_fly = asyncio.create_task(movimentacao_drone2())
 
     client = airsim.MultirotorClient()
+
+    detection.start_detection()
     
     while True:
         start = time.time()
@@ -115,14 +118,19 @@ async def camera2():
         img1d = np.fromstring(response.image_data_uint8, dtype=np.uint8)
         img_rgb = img1d.reshape(response.height, response.width, 3)
 
-        cv2.imshow('Janela', img_rgb)
+        results = detection.detect(img_rgb)
+
+        if results is not None:
+            print(results)
+            cv2.rectangle(img_rgb, (results[0][0], results[0][1]), (results[1][0], results[1][1]), (125, 255, 51), thickness=2)
 
         end = time.time()
         fps = 1 / (end-start)
         print("FPS: ", "{:.2f}".format(fps))
 
+        cv2.imshow('Janela', img_rgb)
+
         if cv2.waitKey(1) & 0xFF == ord('q'):
-            asyncio.Task.cancel(drone2_fly)
             break
 
         await asyncio.sleep(0.1)
