@@ -15,7 +15,7 @@ async def get_lat_lng(drone):  # Define a função para pegar a posição do dro
 async def run():
 
     drone = System()
-    await drone.connect(system_address="udp://:14540")
+    await drone.connect(system_address="serial://COM3:57600")
 
     #Conecta o drone
     print("Waiting for drone to connect...")
