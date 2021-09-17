@@ -5,6 +5,7 @@ import math
 from PIL import Image
 from PIL import ImageDraw
 from os import listdir
+from pathlib import Path
 
 # lugar aleatório -11.363034, -42.966699
 # unifei          -22.412797, -45.449770
@@ -12,6 +13,7 @@ from os import listdir
 # casa do rodrigo -22.42072, -45.44611
 
 # definições gerais
+
 
 def get_satellite_image(vetor_latitude_longitude):
     z = 15  # zoom
@@ -25,12 +27,18 @@ def get_satellite_image(vetor_latitude_longitude):
     x_tile_range = (tile_top_left[0], tile_bottom_right[0])
     y_tile_range = (tile_top_left[1], tile_bottom_right[1])
 
+    # cria repositórios
+    Path("./composite_images/").mkdir(parents=True, exist_ok=True)
+    Path("./elevation_images/").mkdir(parents=True, exist_ok=True)
+
     # puxa a imagem de satélite
     r = requests.get(
         'https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/'
         + str(vetor_latitude_longitude[1]) + ',' + str(vetor_latitude_longitude[0]) + ',16,0' +
-        '/300x200@2x?access_token=pk.eyJ1IjoiZGllbHNvIiwiYSI6ImNrdDAzdmwwNTAxazQydm1oOWg3ajZ2d3gifQ.Y-miIzp9s7r0U59NhLVAbQ',
+        '/300x200@2x?access_token=pk.eyJ1IjoiZGllbHNvIiwiYSI6ImNrdDAzdmwwNTAxazQydm1oOWg3ajZ2d3gifQ.' +
+        'Y-miIzp9s7r0U59NhLVAbQ',
         stream=True)
+
     # salva a imagem de satélite
     with open('./composite_images/' + 'satellite_img @ ' + str(vetor_latitude_longitude) + '.jpeg', 'wb') as f:
         r.raw.decode_content = True
@@ -40,7 +48,8 @@ def get_satellite_image(vetor_latitude_longitude):
     for i, x in enumerate(x_tile_range):
         for j, y in enumerate(y_tile_range):  # Call the URL to get the image back
             r = requests.get('https://api.mapbox.com/v4/mapbox.terrain-rgb/' + str(z) + '/' + str(x) + '/' + str(y) +
-                             '@2x.pngraw?access_token=pk.eyJ1IjoiZGllbHNvIiwiYSI6ImNrdDAzdmwwNTAxazQydm1oOWg3ajZ2d3gifQ.Y-miIzp9s7r0U59NhLVAbQ',
+                             '@2x.pngraw?access_token=pk.eyJ1IjoiZGllbHNvIiwiYSI6ImNrdDAzdmww' +
+                             'NTAxazQydm1oOWg3ajZ2d3gifQ.Y-miIzp9s7r0U59NhLVAbQ',
                              stream=True)  # Next we will write the raw content to an image
             with open('./elevation_images/' + str(i) + '.' + str(j) + '.png', 'wb') as f:
                 r.raw.decode_content = True

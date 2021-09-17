@@ -3,3 +3,7 @@
 /fisico/fire-detection-tensorflow/videos
 /fisico/__pycache__
 /simulação/__pycache__
+/fisico/composite_images
+/fisico/elevation_images
+/.idea
+/.vscode
