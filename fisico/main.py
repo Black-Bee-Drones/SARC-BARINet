@@ -9,8 +9,9 @@ import detection
 
 # Definição do drone 1 como variável global para poder utilizar em qualquer função assíncrona
 drone = System()
-altitude = 2
+altitude = 3
 found = -1
+qntd = 0
 
 
 async def get_lat_lng(dr):  # Define a função para pegar a posição do drone
@@ -76,21 +77,21 @@ async def movimentacao_drone():
 
     # Gira 360 graus
     print('Girando. . .')
-    await drone.offboard.set_velocity_body(VelocityBodyYawspeed(0, 0, 0, 45))
+    await drone.offboard.set_velocity_body(VelocityBodyYawspeed(0, 0, 0, 20))
 
 
 # Função da camera
 async def camera():
-    global found
+    global found, qntd
 
     drone_fly = asyncio.create_task(movimentacao_drone())
 
     await asyncio.sleep(12)
     detection.start_detection()
 
-    precision = 0.75
+    precision = 0.8
 
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(1)
 
     if cap.isOpened() is False:
         print("Error opening video stream or file")
@@ -103,13 +104,17 @@ async def camera():
             results = detection.detect(frame, precision)
 
             if results is not None:
-                print(results)
-                cv2.rectangle(frame, (results[0][0], results[0][1]), (results[1][0], results[1][1]), (125, 255, 51),
-                              thickness=2)
-                cv2.putText(frame, "{:.2f}".format(results[2]), (results[0][0], results[0][1]),
-                            cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
-                print("Achei fogo . . .")
-                found = 1
+                qntd += 1
+                if qntd == 3:
+                    qntd = 0
+                    print(results)
+                    cv2.rectangle(frame, (results[0][0], results[0][1]), (results[1][0], results[1][1]), (125, 255, 51),
+                                  thickness=2)
+                    cv2.putText(frame, "{:.2f}".format(results[2]), (results[0][0], results[0][1]),
+                                cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+                    print("Achei fogo . . .")
+                    cv2.imwrite('fire.png', frame)
+                    found = 1
 
             end = time.time()
             fps = 1 / (end - start)

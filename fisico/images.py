@@ -1,5 +1,5 @@
 import cv2
-from .. import detection
+import detection
 import time
 
 
