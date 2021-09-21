@@ -14,11 +14,9 @@ global drone2
 
 drone2 = System(mavsdk_server_address='localhost', port=50041)
 
-async def main():
-    cam = asyncio.create_task(camera2())
-    await cam
-
 async def movimentacao_drone2():
+
+    cam = asyncio.create_task(camera2())
 
     # Drone se conecta
     await drone2.connect(system_address="udp://:14541")
@@ -95,7 +93,6 @@ async def movimentacao_drone2():
 
 
 async def camera2():
-    drone2_fly = asyncio.create_task(movimentacao_drone2())
 
     client = airsim.MultirotorClient()
 
@@ -143,4 +140,4 @@ async def coordenadas(): #Funcão que printa as coordenadas lat e long
 
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(main())
+    loop.run_until_complete(movimentacao_drone2())
