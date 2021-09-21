@@ -1,2 +1,11 @@
-dataset/videos
-dataset/imgs
+/dataset/imgs
+/dataset/videos
+/fisico/fire-detection-tensorflow/videos
+/fisico/__pycache__
+/simulação/__pycache__
+/fisico/composite_images
+/fisico/elevation_images
+/simulação/composite_images
+/simulação/elevation_images
+/.idea
+/.vscode
