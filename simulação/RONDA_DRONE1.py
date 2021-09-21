@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import asyncio
 from mavsdk import System
-from mavsdk.offboard import (OffboardError, VelocityBodyYawspeed, VelocityNedYaw, PositionNedYaw, Attitude)
+from mavsdk.offboard import (OffboardError, VelocityBodyYawspeed)
 import cv2
 import airsim
 import numpy as np
@@ -9,16 +9,16 @@ import time
 import detection
 
 # Definição do drone 1 como variável global para poder utilizar em qualquer função assíncrona
-drone1 = System(mavsdk_server_address='localhost', port=50040)
 
+global drone1
+
+drone1 = System(mavsdk_server_address='localhost', port=50040)
 
 async def main():
     cam = asyncio.create_task(camera1())
     await cam
 
-
 async def movimentacao_drone1():
-    global drone1
 
     # Drone se conecta
     await drone1.connect(system_address="udp://:14540")
@@ -32,12 +32,6 @@ async def movimentacao_drone1():
     # Setando valores iniciais para o aoffboard
     print("-- Setting initial setpoint")
     await drone1.offboard.set_velocity_body(VelocityBodyYawspeed(0.0, 0.0, 0.0, 0.0))
-
-    await drone1.offboard.set_velocity_ned(VelocityNedYaw(0, 0, 0, 0))
-
-    await drone1.offboard.set_position_ned(PositionNedYaw(0, 0, 0, 0))
-
-    await drone1.offboard.set_attitude(Attitude(0.0, 0.0, 0.0, 0.0))
 
     # Iniciando o Offboard
     try:
@@ -139,6 +133,7 @@ async def camera1():
             print(results)
             cv2.rectangle(img_rgb, (results[0][0], results[0][1]), (results[1][0], results[1][1]), (125, 255, 51),
                           thickness=2)
+            await asyncio.create_task(coordenadas())
 
         end = time.time()
         fps = 1 / (end - start)
@@ -152,6 +147,17 @@ async def camera1():
         await asyncio.sleep(0.1)
 
     cv2.destroyAllWindows()
+
+async def coordenadas(): #Funcão que printa as coordenadas lat e long
+    
+    async for parametros in drone1.telemetry.position():
+        latitude = parametros.latitude_deg
+        longitude = parametros.longitude_deg
+        break
+
+    print(f'\nFIRE!! FIRE !! ')
+    print(f'LATITUDE:','{:.5f}'.format(latitude))
+    print(f'LONGITUDE:','{:.5f}\n'.format(longitude))
 
 
 if __name__ == "__main__":
