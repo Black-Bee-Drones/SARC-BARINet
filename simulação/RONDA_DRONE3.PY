@@ -2,6 +2,7 @@
 import asyncio
 from mavsdk import System
 from mavsdk.offboard import (OffboardError, VelocityBodyYawspeed)
+from satellite_imagery import get_satellite_image
 import cv2
 import numpy as np
 import airsim
@@ -123,6 +124,8 @@ async def coordenadas(): #Funcão que printa as coordenadas lat e long
     print(f'LATITUDE:','{:.5f}'.format(latitude))
     print(f'LONGITUDE:','{:.5f}\n'.format(longitude))
 
+    print("Getting satellite image")
+    get_satellite_image([latitude,longitude])
 
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()

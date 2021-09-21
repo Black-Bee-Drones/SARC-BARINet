@@ -5,5 +5,7 @@
 /simulação/__pycache__
 /fisico/composite_images
 /fisico/elevation_images
+/simulação/composite_images
+/simulação/elevation_images
 /.idea
 /.vscode
