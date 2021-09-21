@@ -3,7 +3,7 @@ import detection
 import time
 
 
-def nothing():
+def nothing(x):
     pass
 
 

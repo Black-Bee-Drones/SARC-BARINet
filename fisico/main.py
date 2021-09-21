@@ -12,6 +12,8 @@ drone = System()
 altitude = 3
 found = -1
 qntd = 0
+precision = 0.4
+camera_num = 1
 
 
 async def get_lat_lng(dr):  # Define a função para pegar a posição do drone
@@ -61,7 +63,7 @@ async def movimentacao_drone():
     await drone.action.set_takeoff_altitude(altitude)  # Configura a altitude de decolagem para 3 m
     print("-- Taking off")
     await drone.action.takeoff()
-    await asyncio.sleep(12)
+    await asyncio.sleep(8)
 
     print("-- Setting offboard initial setpoint")  # Configura as velocidades relativas atuais como 0
     await drone.offboard.set_velocity_body(VelocityBodyYawspeed(0.0, 0.0, 0.0, 0.0))
@@ -76,22 +78,21 @@ async def movimentacao_drone():
         return
 
     # Gira 360 graus
-    print('Girando. . .')
+    print('Rotating. . .')
     await drone.offboard.set_velocity_body(VelocityBodyYawspeed(0, 0, 0, 20))
 
 
 # Função da camera
 async def camera():
     global found, qntd
+    global precision, camera_num
 
-    drone_fly = asyncio.create_task(movimentacao_drone())
-
-    await asyncio.sleep(12)
     detection.start_detection()
 
-    precision = 0.8
+    drone_fly = asyncio.create_task(movimentacao_drone())
+    await asyncio.sleep(4)
 
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(camera_num)
 
     if cap.isOpened() is False:
         print("Error opening video stream or file")
@@ -99,7 +100,7 @@ async def camera():
     while cap.isOpened():
         ret, frame = cap.read()
 
-        if ret is True:
+        if ret:
             start = time.time()
             results = detection.detect(frame, precision)
 
@@ -112,7 +113,7 @@ async def camera():
                                   thickness=2)
                     cv2.putText(frame, "{:.2f}".format(results[2]), (results[0][0], results[0][1]),
                                 cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
-                    print("Achei fogo . . .")
+                    print("Found fire . . .")
                     cv2.imwrite('fire.png', frame)
                     found = 1
 
@@ -120,12 +121,12 @@ async def camera():
             fps = 1 / (end - start)
             print("FPS: ", "{:.2f}".format(fps))
 
-            cv2.imshow('Janela', frame)
+            cv2.imshow('Window', frame)
 
             # Press Q on keyboard to  exit
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.2)
             if cv2.waitKey(1) & 0xFF == ord('q'):
-                print("Interrupção teclado . . .")
+                print("Keyboard Interruption . . .")
                 found = 0
 
             if found != -1:

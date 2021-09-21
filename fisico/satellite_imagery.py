@@ -17,7 +17,6 @@ from pathlib import Path
 
 def get_satellite_image(vetor_latitude_longitude):
     z = 15  # zoom
-
     # definições para a imagem composta
     delta = 0.0055
     bottom_right = [vetor_latitude_longitude[0] - delta, vetor_latitude_longitude[1] + delta]
@@ -120,8 +119,8 @@ def get_satellite_image(vetor_latitude_longitude):
                                               360 * math.pi /
                                               ((lng_lat_top_left[0] - lng_lat_bottom_right[0]) * 180)))))
 
-    print(horizontal_distance_pixels)
-    print(vertical_distance_pixels)
+    # print(horizontal_distance_pixels)
+    # print(vertical_distance_pixels)
 
     # desenha um círculo na coordenada dada
     with Image.open('./composite_images/elevation_image.png') as secim:
