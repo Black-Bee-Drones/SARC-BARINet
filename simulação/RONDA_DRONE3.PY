@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 import asyncio
 from mavsdk import System
-from mavsdk.offboard import (OffboardError, VelocityBodyYawspeed, VelocityNedYaw, PositionNedYaw)
+from mavsdk.offboard import (OffboardError, VelocityBodyYawspeed)
+from satellite_imagery import get_satellite_image
 import cv2
 import numpy as np
 import airsim
@@ -9,16 +10,14 @@ import time
 import detection
 
 # Definição do drone 1 como variável global para poder utilizar em qualquer função assíncrona
+
+global drone3
+
 drone3 = System(mavsdk_server_address='localhost', port=50042)
 
-
-async def main():
-    cam = asyncio.create_task(camera3())
-    await cam
-
-
 async def movimentacao_drone3():
-    global drone3
+
+    cam = asyncio.create_task(camera3())
 
     # Drone se conecta
     await drone3.connect(system_address="udp://:14542")
@@ -32,10 +31,6 @@ async def movimentacao_drone3():
     # Setando valores iniciais para o offboard
     print("-- Setting initial setpoint")
     await drone3.offboard.set_velocity_body(VelocityBodyYawspeed(0.0, 0.0, 0.0, 0.0))
-
-    await drone3.offboard.set_velocity_ned(VelocityNedYaw(0, 0, 0, 0))
-
-    await drone3.offboard.set_position_ned(PositionNedYaw(0, 0, 0, 0))
 
     # Iniciando o Offboard
     try:
@@ -83,7 +78,6 @@ async def movimentacao_drone3():
 
 
 async def camera3():
-    drone3_fly = asyncio.create_task(movimentacao_drone3())
 
     client = airsim.MultirotorClient()
 
@@ -103,6 +97,7 @@ async def camera3():
             print(results)
             cv2.rectangle(img_rgb, (results[0][0], results[0][1]), (results[1][0], results[1][1]), (125, 255, 51),
                           thickness=2)
+            await asyncio.create_task(coordenadas())
 
         end = time.time()
         fps = 1 / (end - start)
@@ -118,7 +113,20 @@ async def camera3():
 
     cv2.destroyAllWindows()
 
+async def coordenadas(): #Funcão que printa as coordenadas lat e long
+    
+    async for parametros in drone3.telemetry.position():
+        latitude = parametros.latitude_deg
+        longitude = parametros.longitude_deg
+        break
+
+    print(f'\nFIRE!! FIRE !! ')
+    print(f'LATITUDE:','{:.5f}'.format(latitude))
+    print(f'LONGITUDE:','{:.5f}\n'.format(longitude))
+
+    print("Getting satellite image")
+    get_satellite_image([latitude,longitude])
 
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(main())
+    loop.run_until_complete(movimentacao_drone3())
