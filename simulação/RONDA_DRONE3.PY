@@ -73,6 +73,7 @@ async def movimentacao_drone3():
         print(f"Stopping offboard mode failed with error code: \
               {error._result.result}")
 
+    await asyncio.Task.cancel(camera3())
     await drone3.action.return_to_launch()
     await asyncio.sleep(20)
 
@@ -125,7 +126,7 @@ async def coordenadas(): #Funcão que printa as coordenadas lat e long
     print(f'LONGITUDE:','{:.5f}\n'.format(longitude))
 
     print("Getting satellite image")
-    get_satellite_image([latitude,longitude])
+    await asyncio.create_task(get_satellite_image([latitude,longitude]))
 
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()

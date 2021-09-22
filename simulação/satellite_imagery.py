@@ -2,6 +2,7 @@ import shutil
 import mercantile
 import requests
 import math
+import asyncio
 from PIL import Image
 from PIL import ImageDraw
 from os import listdir
@@ -15,7 +16,7 @@ from pathlib import Path
 # definições gerais
 
 
-def get_satellite_image(vetor_latitude_longitude):
+async def get_satellite_image(vetor_latitude_longitude):
     z = 15  # zoom
 
     # definições para a imagem composta
@@ -103,10 +104,8 @@ def get_satellite_image(vetor_latitude_longitude):
 
     # calcula a distancia, em graus, do tile cima esquerda até a coordenada de destino
     horizontal_distance_degrees = vetor_latitude_longitude[1] - lng_lat_top_left[0]
-    print(horizontal_distance_degrees)
 
     vertical_distance_degrees = lng_lat_top_left[1] - vetor_latitude_longitude[0]
-    print(vertical_distance_degrees)
     # transforma (roughly) a distancia de graus para pixels
     horizontal_distance_pixels = (int(horizontal_distance_degrees * pixel_degree_ratio_horizontal -
                                       (60 * lng_lat_top_left[1] / lng_lat_bottom_right[1]) *
@@ -119,9 +118,6 @@ def get_satellite_image(vetor_latitude_longitude):
                                               360 * math.pi /
                                               ((lng_lat_top_left[0] - lng_lat_bottom_right[0]) * 180)))))
 
-    print(horizontal_distance_pixels)
-    print(vertical_distance_pixels)
-
     # desenha um círculo na coordenada dada
     with Image.open('./composite_images/elevation_image.png') as secim:
         draw = ImageDraw.Draw(secim)
@@ -129,3 +125,4 @@ def get_satellite_image(vetor_latitude_longitude):
                       horizontal_distance_pixels + 40, vertical_distance_pixels + 40], outline=(255, 0, 0), width=3)
         secim.show()
         im.show()  # exibe as imagens
+    await asyncio.sleep(15)
