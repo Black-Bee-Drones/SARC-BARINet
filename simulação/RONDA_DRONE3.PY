@@ -9,7 +9,7 @@ import airsim
 import time
 import detection
 
-# Definição do drone 1 como variável global para poder utilizar em qualquer função assíncrona
+# Definição do drone 3 como variável global para poder utilizar em qualquer função assíncrona
 
 global drone3
 
@@ -22,10 +22,10 @@ async def movimentacao_drone3():
     # Drone se conecta
     await drone3.connect(system_address="udp://:14542")
 
-    print("Waiting for drone 1 to connect...")
+    print("Waiting for drone 3 to connect...")
     async for state in drone3.core.connection_state():
         if state.is_connected:
-            print(f"Drone 1 discovered!")
+            print(f"Drone 3 discovered!")
             break
 
     # Setando valores iniciais para o offboard
@@ -36,8 +36,8 @@ async def movimentacao_drone3():
     try:
         await drone3.offboard.start()
     except OffboardError as error:
-        print(f"Start Drone 1 offboard failed with error code: {error._result.result}")
-        print("-- Drone 1  Disarming")
+        print(f"Start Drone 3 offboard failed with error code: {error._result.result}")
+        print("-- Drone 3  Disarming")
         await drone3.action.disarm()
         return
 
@@ -49,21 +49,18 @@ async def movimentacao_drone3():
     await drone3.offboard.set_velocity_body(VelocityBodyYawspeed(0.0, 0.0, -5.0, -14))
     await asyncio.sleep(15)
 
-    print("Indo pra frente. . .")
+    print("-- Mission Drone 3")
+    # Indo pra frente. . .
     await drone3.offboard.set_velocity_body(VelocityBodyYawspeed(5, 0, 0, 0))
     await asyncio.sleep(43)
 
-    print('Subindo. . .')
+    # Subindo. . .
     await drone3.offboard.set_velocity_body(VelocityBodyYawspeed(0, 0, -4, 0))
     await asyncio.sleep(10)
 
-    print("Dando uma giradinha")
+    # Dando uma giradinha
     await drone3.offboard.set_velocity_body(VelocityBodyYawspeed(0, 0, 0, -27, ))
     await asyncio.sleep(20)
-
-    print("Voltando para o ponto inicial")
-    await drone3.offboard.set_position_ned(PositionNedYaw(0, 0, -60, 0))
-    await asyncio.sleep(25)
 
     # Para o offboard
     print("-- Stopping offboard")
@@ -73,7 +70,10 @@ async def movimentacao_drone3():
         print(f"Stopping offboard mode failed with error code: \
               {error._result.result}")
 
+    #  Para a funçao camera rodando em segundo plano
     await asyncio.Task.cancel(camera3())
+
+    print("-- Returning to Launch")
     await drone3.action.return_to_launch()
     await asyncio.sleep(20)
 
@@ -114,7 +114,7 @@ async def camera3():
 
     cv2.destroyAllWindows()
 
-async def coordenadas(): #Funcão que printa as coordenadas lat e long
+async def coordenadas(): #Funcão que printa as coordenadas lat e long e imagens satelite
     
     async for parametros in drone3.telemetry.position():
         latitude = parametros.latitude_deg

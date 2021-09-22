@@ -9,7 +9,7 @@ import numpy as np
 import time
 import detection
 
-# Definição do drone 1 como variável global para poder utilizar em qualquer função assíncrona
+# Definição do drone 2 como variável global para poder utilizar em qualquer função assíncrona
 
 global drone2
 
@@ -36,8 +36,8 @@ async def movimentacao_drone2():
     try:
         await drone2.offboard.start()
     except OffboardError as error:
-        print(f"Start Drone 1 offboard failed with error code: {error._result.result}")
-        print("-- Drone 1  Disarming")
+        print(f"Start Drone 2 offboard failed with error code: {error._result.result}")
+        print("-- Drone 2  Disarming")
         await drone2.action.disarm()
         return
 
@@ -49,37 +49,34 @@ async def movimentacao_drone2():
     await drone2.offboard.set_velocity_body(VelocityBodyYawspeed(0.0, 0.0, -6.0, 7))
     await asyncio.sleep(15)
 
+    print("-- Mission Drone 2")
     await drone2.offboard.set_velocity_body(VelocityBodyYawspeed(0, 0, 0, 0))
     await asyncio.sleep(3)
 
     await drone2.offboard.set_velocity_body(VelocityBodyYawspeed(4, 0, 0, 0))
     await asyncio.sleep(15)
 
-    print("Primeira curva")
+    # Primeira curva
     await drone2.offboard.set_velocity_body(VelocityBodyYawspeed(7, 0, -1, 28))
     await asyncio.sleep(6)
     await drone2.offboard.set_velocity_body(VelocityBodyYawspeed(4, 0, 0, 0))
     await asyncio.sleep(22)
 
-    print("Segunda curva")
+    # Segunda curva
     await drone2.offboard.set_velocity_body(VelocityBodyYawspeed(7, 0, -1, -28))
     await asyncio.sleep(6)
     await drone2.offboard.set_velocity_body(VelocityBodyYawspeed(4, 0, -2, 0))
     await asyncio.sleep(22)
 
-    print("Subindo. . .")
+    # Subindo. . .
     await drone2.offboard.set_velocity_body(VelocityBodyYawspeed(0, 0, -2, 0))
     await asyncio.sleep(10)
 
-    print("Terceira curva")
+    # Terceira curva
     await drone2.offboard.set_velocity_body(VelocityBodyYawspeed(7, 0, -1, 28))
     await asyncio.sleep(6)
     await drone2.offboard.set_velocity_body(VelocityBodyYawspeed(4, 0, 0, 0))
     await asyncio.sleep(22)
-
-    print("Voltando para o ponto inicial")
-    await drone2.offboard.set_position_ned(PositionNedYaw(0, 0, -60, 0))
-    await asyncio.sleep(25)
 
     # Para o offboard
     print("-- Stopping offboard")
@@ -89,7 +86,10 @@ async def movimentacao_drone2():
         print(f"Stopping offboard mode failed with error code: \
               {error._result.result}")
 
+    #  Para a funçao camera rodando em segundo plano
     await asyncio.Task.cancel(camera2())
+
+    print("-- Returning to Launch")
     await drone2.action.return_to_launch()
     await asyncio.sleep(15)
 
@@ -129,7 +129,7 @@ async def camera2():
 
     cv2.destroyAllWindows()
 
-async def coordenadas(): #Funcão que printa as coordenadas lat e long
+async def coordenadas(): #Funcão que printa as coordenadas lat e long e imagens satelite
     
     async for parametros in drone2.telemetry.position():
         latitude = parametros.latitude_deg
