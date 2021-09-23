@@ -2,9 +2,11 @@ import shutil
 import mercantile
 import requests
 import math
+import asyncio
 from PIL import Image
 from PIL import ImageDraw
 from os import listdir
+from pathlib import Path
 
 # lugar aleatório -11.363034, -42.966699
 # unifei          -22.412797, -45.449770
@@ -13,7 +15,8 @@ from os import listdir
 
 # definições gerais
 
-def get_satellite_image(vetor_latitude_longitude):
+
+async def get_satellite_image(vetor_latitude_longitude):
     z = 15  # zoom
 
     # definições para a imagem composta
@@ -25,11 +28,16 @@ def get_satellite_image(vetor_latitude_longitude):
     x_tile_range = (tile_top_left[0], tile_bottom_right[0])
     y_tile_range = (tile_top_left[1], tile_bottom_right[1])
 
+    # cria repositórios
+    Path("./composite_images/").mkdir(parents=True, exist_ok=True)
+    Path("./elevation_images/").mkdir(parents=True, exist_ok=True)
+
     # puxa a imagem de satélite
     r = requests.get(
         'https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/'
         + str(vetor_latitude_longitude[1]) + ',' + str(vetor_latitude_longitude[0]) + ',16,0' +
-        '/300x200@2x?access_token=pk.eyJ1IjoiZGllbHNvIiwiYSI6ImNrdDAzdmwwNTAxazQydm1oOWg3ajZ2d3gifQ.Y-miIzp9s7r0U59NhLVAbQ',
+        '/300x200@2x?access_token=pk.eyJ1IjoiZGllbHNvIiwiYSI6ImNrdDAzdmwwNTAxazQydm1oOWg3ajZ2d3gifQ.' +
+        'Y-miIzp9s7r0U59NhLVAbQ',
         stream=True)
     # salva a imagem de satélite
     with open('./composite_images/' + 'satellite_img @ ' + str(vetor_latitude_longitude) + '.jpeg', 'wb') as f:
@@ -40,7 +48,8 @@ def get_satellite_image(vetor_latitude_longitude):
     for i, x in enumerate(x_tile_range):
         for j, y in enumerate(y_tile_range):  # Call the URL to get the image back
             r = requests.get('https://api.mapbox.com/v4/mapbox.terrain-rgb/' + str(z) + '/' + str(x) + '/' + str(y) +
-                             '@2x.pngraw?access_token=pk.eyJ1IjoiZGllbHNvIiwiYSI6ImNrdDAzdmwwNTAxazQydm1oOWg3ajZ2d3gifQ.Y-miIzp9s7r0U59NhLVAbQ',
+                             '@2x.pngraw?access_token=pk.eyJ1IjoiZGllbHNvIiwiYSI6ImNrdDAzdmwwNTAxaz' +
+                             'Qydm1oOWg3ajZ2d3gifQ.Y-miIzp9s7r0U59NhLVAbQ',
                              stream=True)  # Next we will write the raw content to an image
             with open('./elevation_images/' + str(i) + '.' + str(j) + '.png', 'wb') as f:
                 r.raw.decode_content = True
@@ -95,10 +104,8 @@ def get_satellite_image(vetor_latitude_longitude):
 
     # calcula a distancia, em graus, do tile cima esquerda até a coordenada de destino
     horizontal_distance_degrees = vetor_latitude_longitude[1] - lng_lat_top_left[0]
-    print(horizontal_distance_degrees)
 
     vertical_distance_degrees = lng_lat_top_left[1] - vetor_latitude_longitude[0]
-    print(vertical_distance_degrees)
     # transforma (roughly) a distancia de graus para pixels
     horizontal_distance_pixels = (int(horizontal_distance_degrees * pixel_degree_ratio_horizontal -
                                       (60 * lng_lat_top_left[1] / lng_lat_bottom_right[1]) *
@@ -111,9 +118,6 @@ def get_satellite_image(vetor_latitude_longitude):
                                               360 * math.pi /
                                               ((lng_lat_top_left[0] - lng_lat_bottom_right[0]) * 180)))))
 
-    print(horizontal_distance_pixels)
-    print(vertical_distance_pixels)
-
     # desenha um círculo na coordenada dada
     with Image.open('./composite_images/elevation_image.png') as secim:
         draw = ImageDraw.Draw(secim)
@@ -121,3 +125,4 @@ def get_satellite_image(vetor_latitude_longitude):
                       horizontal_distance_pixels + 40, vertical_distance_pixels + 40], outline=(255, 0, 0), width=3)
         secim.show()
         im.show()  # exibe as imagens
+    await asyncio.sleep(15)

@@ -1,5 +1,4 @@
 import airsim
-import os
 import cv2
 import numpy as np
 import time
@@ -7,15 +6,17 @@ import time
 # connect to the AirSim simulator
 client = airsim.MultirotorClient()
 
+
 def get_image(drone_num):
     drone_name = 'Drone' + str(drone_num)
     responses = client.simGetImages([airsim.ImageRequest("0", airsim.ImageType.Scene, False, False)],
                                     vehicle_name=drone_name)
     return responses[0]
 
+
 def show_img():
     for i in range(3):
-        response = get_image(i+1)
+        response = get_image(i + 1)
         # get numpy array
         img1d = np.fromstring(response.image_data_uint8, dtype=np.uint8)
         # reshape array to 4 channel image array H X W X 4
@@ -30,12 +31,12 @@ def show_img():
 
 while True:
     start = time.time()
-    
+
     if show_img():
-        break    
+        break
 
     end = time.time()
-    fps = 1 / (end-start)
+    fps = 1 / (end - start)
     print("FPS: ", "{:.2f}".format(fps))
 
 cv2.destroyAllWindows()
